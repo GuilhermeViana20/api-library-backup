@@ -1,0 +1,31 @@
+name: Build Laravel Project and Push to Build Branch
+
+on:
+  push:
+    branches:
+      - master # The branch name your are commit the new changes
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Build Laravel Project and Push to Another Branch
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+
+      - name: Install Composer dependencies
+        run: composer install --no-progress --no-suggest --prefer-dist --optimize-autoloader --no-dev
+
+      - name: Push built assets
+        uses: s0/git-publish-subdir-action@develop
+        env:
+          REPO: self
+          BRANCH: build # O branch onde você deseja enviar os arquivos compilados
+          FOLDER: public # A pasta onde os assets compilados do Laravel Mix são gerados
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # O token do GitHub
+          MESSAGE: "Build: ({sha}) {msg}" # Mensagem do commit
