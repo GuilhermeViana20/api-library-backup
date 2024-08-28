@@ -14,3 +14,7 @@ Route::apiResource('categories', CategoryController::class);
 
 Route::get('categories/{id}/books', [CategoryController::class, 'listBooksByCategory']);
 Route::get('search', [BookController::class, 'searchBooks']);
+
+Route::get('/teste', function () {
+    return 'teste';
+});
