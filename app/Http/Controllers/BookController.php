@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
+use App\Models\BookCategory;
 use Illuminate\Http\Request;
 
 class BookController extends Controller
@@ -37,9 +38,21 @@ class BookController extends Controller
             'description' => 'nullable|string',
             'authors' => 'required|string|max:255',
             'image' => 'nullable|string|max:255',
+            'pdf' => 'nullable|string',
+            'category_id' => 'required|integer|exists:categories,id',
         ]);
 
+        if ($request->hasFile('pdf')) {
+            $validatedData['pdf'] = base64_encode(file_get_contents($request->file('pdf')));
+        }
+
         $book = Book::create($validatedData);
+
+        $bookCategory = new BookCategory();
+        $bookCategory->book_id = $book->id;
+        $bookCategory->category_id = $validatedData['category_id'];
+        $bookCategory->save();
+
         return response()->json($book, 201);
     }
 
@@ -115,9 +128,7 @@ class BookController extends Controller
     {
         $query = $request->input('query');
 
-        $books = Book::where('title', 'LIKE', "%{$query}%")
-                    ->with('categories')
-                    ->get();
+        $books = Book::where('title', 'like', "%" . $query . "%")->get();
 
         $groupedBooks = [];
 

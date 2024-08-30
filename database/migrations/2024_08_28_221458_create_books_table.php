@@ -19,6 +19,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->string('authors', 255);
             $table->string('image', 255)->nullable();
+            $table->longText('pdf')->nullable();
             $table->timestamps();
         });
     }
